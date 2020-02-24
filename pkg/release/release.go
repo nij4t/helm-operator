@@ -341,8 +341,6 @@ func shouldSync(logger log.Logger, client helm.Client, hr *v1.HelmRelease, curRe
 		logger.Log("warning", "release appears to be managed by "+resourceID, "action", "skip")
 		return false, false, nil
 	}
-
-	// If the current state of the release does not allow us to safely upgrade, we skip.
 	if s := curRel.Info.Status; !s.AllowsUpgrade() {
 		logger.Log("warning", "unable to sync release with status "+s.String(), "action", "skip")
 		return false, false, nil
@@ -363,6 +361,7 @@ func shouldSync(logger log.Logger, client helm.Client, hr *v1.HelmRelease, curRe
 		Namespace:   hr.GetTargetNamespace(),
 		Force:       hr.Spec.ForceUpgrade,
 		ResetValues: hr.Spec.ResetValues,
+		ClientOnly:  false,
 	})
 	if err != nil {
 		return false, false, err
